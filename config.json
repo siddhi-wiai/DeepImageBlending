@@ -1,0 +1,29 @@
+{
+    "input_data" : {
+        "folder" : "./data/",
+        "source_image_size" : 50,
+        "source_image_width" : 50,
+        "source_image_height" : 50,
+        "target_image_size" : 512, 
+        "x_center" : 300,
+        "y_center" : 300,
+        "_comment1" : "x_center and y_center represent the central horizontal and vertical coordinates for source (foreground) image insertion"
+    },
+
+    "output_data":{
+        "folder" : "./results/",
+        "save_video" : false,
+        "_comment2" : "save_video represents the bool parameter to save reconstruction video"
+        
+    },
+
+    "model" : {
+        "gpu_id" : "mps",
+        "num_steps": 20,
+        "num_steps1" : 1000,
+        "num_steps2" : 400,
+        "_comment3" : " num_steps represents the number of iterations in each pass (todo: create num_steps1 and num_steps2 for both the passes separately) "
+    }
+
+
+}

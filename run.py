@@ -10,22 +10,22 @@ from utils import compute_gt_gradient, make_canvas_mask, numpy2tensor, laplacian
 import argparse
 import pdb
 import os
-import imageio.v2 as iio
+#import imageio.v2 as iio
 import torch.nn.functional as F
 
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--source_file', type=str, default='data/1_source.png', help='path to the source image')
-parser.add_argument('--mask_file', type=str, default='data/1_mask.png', help='path to the mask image')
-parser.add_argument('--target_file', type=str, default='data/1_target.png', help='path to the target image')
-parser.add_argument('--output_dir', type=str, default='results/1', help='path to output')
-parser.add_argument('--ss', type=int, default=300, help='source image size')
+parser.add_argument('--source_file', type=str, default='data/6_source.png', help='path to the source image')
+parser.add_argument('--mask_file', type=str, default='data/6_mask.png', help='path to the mask image')
+parser.add_argument('--target_file', type=str, default='data/6_target.png', help='path to the target image')
+parser.add_argument('--output_dir', type=str, default='results/6', help='path to output')
+parser.add_argument('--ss', type=int, default=50, help='source image size')
 parser.add_argument('--ts', type=int, default=512, help='target image size')
-parser.add_argument('--x', type=int, default=200, help='vertical location (center)')
-parser.add_argument('--y', type=int, default=235, help='vertical location (center)')
+parser.add_argument('--x', type=int, default=300, help='vertical location (center)')
+parser.add_argument('--y', type=int, default=300, help='vertical location (center)')
 parser.add_argument('--gpu_id', type=int, default=0, help='GPU ID')
-parser.add_argument('--num_steps', type=int, default=1000, help='Number of iterations in each pass')
+parser.add_argument('--num_steps', type=int, default=20, help='Number of iterations in each pass')
 parser.add_argument('--save_video', type=bool, default=False, help='save the intermediate reconstruction process')
 opt = parser.parse_args()
 
@@ -45,6 +45,7 @@ target_file = opt.target_file
 
 # Hyperparameter Inputs
 gpu_id = opt.gpu_id
+gpu_id = "mps"
 num_steps = opt.num_steps
 ss = opt.ss; # source image size
 ts = opt.ts # target image size
@@ -89,12 +90,12 @@ mean_shift = MeanShift(gpu_id)
 vgg = Vgg16().to(gpu_id)
 
 # Save reconstruction process in a video
-if opt.save_video:
-    recon_process_video = iio.get_writer(os.path.join(opt.output_dir, 'recon_process.mp4'), format='FFMPEG', mode='I', fps=400)
+# if opt.save_video:
+#     recon_process_video = iio.get_writer(os.path.join(opt.output_dir, 'recon_process.mp4'), format='FFMPEG', mode='I', fps=400)
 
 run = [0]
-while run[0] <= num_steps:
-    
+while run[0] < num_steps:
+
     def closure():
         # Composite Foreground and Background to Make Blended Image
         blend_img = torch.zeros(target_img.shape).to(gpu_id)
@@ -142,18 +143,18 @@ while run[0] <= num_steps:
         loss.backward()
 
         # Write to output to a reconstruction video 
-        if opt.save_video:
-            foreground = input_img*canvas_mask
-            foreground = (foreground - foreground.min()) / (foreground.max() - foreground.min())
-            background = target_img*(canvas_mask-1)*(-1)
-            background = background / 255.0
-            final_blend_img =  + foreground + background
-            if run[0] < 200:
-                # more frames for early optimization by repeatedly appending the frames
-                for _ in range(10):
-                    recon_process_video.append_data(final_blend_img[0].transpose(0,2).transpose(0,1).cpu().data.numpy())
-            else:
-                recon_process_video.append_data(final_blend_img[0].transpose(0,2).transpose(0,1).cpu().data.numpy())
+        # if opt.save_video:
+        #     foreground = input_img*canvas_mask
+        #     foreground = (foreground - foreground.min()) / (foreground.max() - foreground.min())
+        #     background = target_img*(canvas_mask-1)*(-1)
+        #     background = background / 255.0
+        #     final_blend_img =  + foreground + background
+        #     if run[0] < 200:
+        #         # more frames for early optimization by repeatedly appending the frames
+        #         for _ in range(10):
+        #             recon_process_video.append_data(final_blend_img[0].transpose(0,2).transpose(0,1).cpu().data.numpy())
+        #     else:
+        #         recon_process_video.append_data(final_blend_img[0].transpose(0,2).transpose(0,1).cpu().data.numpy())
         
         # Print Loss
         if run[0] % 1 == 0:
@@ -209,7 +210,7 @@ optimizer = get_input_optimizer(first_pass_img)
 
 print('Optimizing...')
 run = [0]
-while run[0] <= num_steps:
+while run[0] < num_steps:
     
     def closure():
         
@@ -234,13 +235,13 @@ while run[0] <= num_steps:
         loss.backward()
 
         # Write to output to a reconstruction video 
-        if opt.save_video:
-            foreground = first_pass_img*canvas_mask
-            foreground = (foreground - foreground.min()) / (foreground.max() - foreground.min())
-            background = target_img*(canvas_mask-1)*(-1)
-            background = background / 255.0
-            final_blend_img =  + foreground + background
-            recon_process_video.append_data(final_blend_img[0].transpose(0,2).transpose(0,1).cpu().data.numpy())
+        # if opt.save_video:
+        #     foreground = first_pass_img*canvas_mask
+        #     foreground = (foreground - foreground.min()) / (foreground.max() - foreground.min())
+        #     background = target_img*(canvas_mask-1)*(-1)
+        #     background = background / 255.0
+        #     final_blend_img =  + foreground + background
+        #     recon_process_video.append_data(final_blend_img[0].transpose(0,2).transpose(0,1).cpu().data.numpy())
         
         # Print Loss
         if run[0] % 1 == 0:
@@ -266,8 +267,8 @@ input_img_np = first_pass_img.transpose(1,3).transpose(1,2).cpu().data.numpy()[0
 imsave(os.path.join(opt.output_dir, 'second_pass.png'), input_img_np.astype(np.uint8))
 
 # Save recon process video
-if opt.save_video:
-    recon_process_video.close()
+# if opt.save_video:
+#     recon_process_video.close()
 
 
 
