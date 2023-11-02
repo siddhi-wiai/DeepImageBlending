@@ -11,17 +11,17 @@
     },
 
     "output_data":{
-        "folder" : "./results/",
+        "folder" : "./results_temp/",
         "save_video" : false,
         "_comment2" : "save_video represents the bool parameter to save reconstruction video"
         
     },
 
     "model" : {
-        "gpu_id" : "mps",
+        "gpu_id" : "cuda:1",
         "num_steps": 20,
-        "num_steps1" : 1000,
-        "num_steps2" : 400,
+        "num_steps1" : 100,
+        "num_steps2" : 40,
         "_comment3" : " num_steps represents the number of iterations in each pass (todo: create num_steps1 and num_steps2 for both the passes separately) "
     }
 
