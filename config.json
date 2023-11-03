@@ -1,6 +1,8 @@
 {
     "input_data" : {
-        "folder" : "./data/",
+        "foregroundImages" : "/Users/siddhibrahmbhatt/Siddhi/Data/DeepImageBlendingData/ForegroundImages/val/",
+        "foregroundMasks" : "/Users/siddhibrahmbhatt/Siddhi/Data/DeepImageBlendingData/ForegroundMasks/val/",
+        "backgroundImages" : "/Users/siddhibrahmbhatt/Siddhi/Data/DeepImageBlendingData/BackgroundImages/val/", 
         "source_image_size" : 50,
         "source_image_width" : 50,
         "source_image_height" : 50,
@@ -11,7 +13,9 @@
     },
 
     "output_data":{
-        "folder" : "./results/",
+        "images" : "/Users/siddhibrahmbhatt/Siddhi/Data/DeepImageBlendingData/Outputs/images/val/",
+        "labels": "/Users/siddhibrahmbhatt/Siddhi/Data/DeepImageBlendingData/Outputs/labels/val/",
+        "metadata" : "/Users/siddhibrahmbhatt/Siddhi/Data/DeepImageBlendingData/Outputs/metadata/val/",
         "save_video" : false,
         "_comment2" : "save_video represents the bool parameter to save reconstruction video"
         
@@ -20,8 +24,8 @@
     "model" : {
         "gpu_id" : "mps",
         "num_steps": 20,
-        "num_steps1" : 1000,
-        "num_steps2" : 400,
+        "num_steps1" : 10,
+        "num_steps2" : 0,
         "_comment3" : " num_steps represents the number of iterations in each pass (todo: create num_steps1 and num_steps2 for both the passes separately) "
     }
 
